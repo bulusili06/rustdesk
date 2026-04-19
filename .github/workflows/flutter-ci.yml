@@ -22,3 +22,23 @@ jobs:
     uses: ./.github/workflows/flutter-build.yml
     with:
       upload-artifact: false
+  upload-packages:
+    needs: run-ci
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Re-upload for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-packages-${{ github.run_id }}
+          path: |
+            ./artifacts/build/windows/runner/Release/*.exe
+            ./artifacts/build/windows/runner/Release/*.zip
+            ./artifacts/build/app/outputs/flutter-apk/*.apk
+            ./artifacts/build/linux/x64/release/bundle/*.AppImage
+          retention-days: 7
